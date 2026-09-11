@@ -1,0 +1,20 @@
+# model 
+*.pt
+
+# datasets
+images/
+videos/
+training/
+
+# temporary files 
+runs/
+stubs/
+
+# images 
+*.jpg
+
+# personal / experimental scripts 
+detection.py
+draft.py
+yolo_inference.py
+idea.txt
