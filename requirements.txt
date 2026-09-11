@@ -1,2 +1,8 @@
 python=3.11
 supervision
+ultralytics
+scikit-learn
+numpy
+pandas
+cv2
+pickle
