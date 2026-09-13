@@ -1,4 +1,6 @@
 import numpy as np
+
+from camera_movement_estimator import CameraMovementEstimator
 from player_ball_assigner import PlayerBallAssigner
 from team_assigner import TeamAssigner
 from trackers import Tracker
@@ -13,6 +15,12 @@ def main():
     tracker = Tracker("models/best_yolov8l_1.pt")
     tracks = tracker.get_object_tracks(
         video_frames, read_from_stub=True, stub_path="stubs/track_stubs_yolov8l_1.pkl"
+    )
+
+    """Camera Movement Estimator"""
+    camera_movement_estimator = CameraMovementEstimator(video_frames[0])
+    camera_movement_per_frame = camera_movement_estimator.get_camera_movement(
+        video_frames, read_from_stub=True, stub_path="stubs/camera_movement_stub.pkl"
     )
 
     """interpolate ball positions"""
@@ -47,7 +55,6 @@ def main():
             team_ball_control.append(
                 tracks["players"][frame_num][assigned_player]["team"]
             )
-            print(assigned_player, tracks["players"][frame_num][assigned_player])
         else:
             team_ball_control.append(team_ball_control[-1])
 
@@ -58,6 +65,11 @@ def main():
     # Draw Output Tracks
     output_video_frames = tracker.draw_annotation(
         video_frames, tracks, team_ball_control
+    )
+
+    # Draw Camera Movement
+    output_video_frames = camera_movement_estimator.draw_camera_movement(
+        output_video_frames, camera_movement_per_frame
     )
 
     """save video"""
