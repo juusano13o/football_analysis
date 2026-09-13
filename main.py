@@ -1,3 +1,4 @@
+import numpy as np
 from player_ball_assigner import PlayerBallAssigner
 from team_assigner import TeamAssigner
 from trackers import Tracker
@@ -33,6 +34,7 @@ def main():
 
     """Assign Player to Ball"""
     player_ball_assigner = PlayerBallAssigner()
+    team_ball_control = []
     # player_track: {id: player}
     for frame_num, player_track in enumerate(tracks["players"]):
         ball_bbox = tracks["ball"][frame_num][1]["bbox"]
@@ -42,10 +44,21 @@ def main():
 
         if assigned_player != -1:
             tracks["players"][frame_num][assigned_player]["has_ball"] = True
+            team_ball_control.append(
+                tracks["players"][frame_num][assigned_player]["team"]
+            )
+            print(assigned_player, tracks["players"][frame_num][assigned_player])
+        else:
+            team_ball_control.append(team_ball_control[-1])
+
+    # to be used in cv2
+    team_ball_control = np.array(team_ball_control)
 
     """Draw output"""
     # Draw Output Tracks
-    output_video_frames = tracker.draw_annotation(video_frames, tracks)
+    output_video_frames = tracker.draw_annotation(
+        video_frames, tracks, team_ball_control
+    )
 
     """save video"""
     save_video(output_video_frames, "videos/video0_output.avi")

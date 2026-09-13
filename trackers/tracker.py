@@ -157,7 +157,46 @@ class Tracker:
         cv2.drawContours(frame, [triangle_points], 0, (0, 0, 0), 2)
         return frame
 
-    def draw_annotation(self, video_frames, tracks):
+    def draw_team_ball_control(self, frame, frame_num, team_ball_control):
+        # draw a semi-transparent rectangle
+        overlay = frame.copy()
+        cv2.rectangle(overlay, (1350, 850), (1900, 970), (255, 255, 255), cv2.FILLED)
+        alpha = 0.4
+        # alpha*f1 + (1-alpha)*f2 + gamma = destination
+        cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+
+        team_ball_control_till_frame = team_ball_control[: frame_num + 1]
+        # get the number of time each team had ball control
+        team_1_num_frame = team_ball_control_till_frame[
+            team_ball_control_till_frame == 1
+        ].shape[0]
+        team_2_num_frame = team_ball_control_till_frame[
+            team_ball_control_till_frame == 2
+        ].shape[0]
+        team_1 = team_1_num_frame / (team_1_num_frame + team_2_num_frame)
+        team_2 = team_2_num_frame / (team_1_num_frame + team_2_num_frame)
+
+        cv2.putText(
+            frame,
+            f"Team 1 ball control: {team_1 * 100:.2f}%",
+            (1400, 900),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (0, 0, 0),
+            2,
+        )
+        cv2.putText(
+            frame,
+            f"Team 2 ball control: {team_2 * 100:.2f}%",
+            (1400, 950),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (0, 0, 0),
+            2,
+        )
+        return frame
+
+    def draw_annotation(self, video_frames, tracks, team_ball_control=None):
         output_video_frames = []
         for frame_num, frame in enumerate(video_frames):
             frame = frame.copy()
@@ -181,6 +220,9 @@ class Tracker:
             # draw triangle above the ball
             for _, ball in ball_dict.items():
                 frame = self.draw_triangle(frame, ball["bbox"], (0, 255, 0))
+
+            # draw team ball control pannel
+            frame = self.draw_team_ball_control(frame, frame_num, team_ball_control)
 
             output_video_frames.append(frame)
 
