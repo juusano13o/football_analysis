@@ -1,3 +1,4 @@
+from player_ball_assigner import PlayerBallAssigner
 from team_assigner import TeamAssigner
 from trackers import Tracker
 from utils import read_video, save_video
@@ -8,9 +9,9 @@ def main():
     video_frames = read_video("videos/video0.mp4")
 
     """get object track"""
-    tracker = Tracker("models/best_m.pt")
+    tracker = Tracker("models/best_yolov8l_1.pt")
     tracks = tracker.get_object_tracks(
-        video_frames, read_from_stub=True, stub_path="stubs/track_stubs.pkl"
+        video_frames, read_from_stub=True, stub_path="stubs/track_stubs_yolov8l_1.pkl"
     )
 
     """interpolate ball positions"""
@@ -29,6 +30,18 @@ def main():
             tracks["players"][frame_num][player_id]["team_color"] = (
                 team_assigner.team_colors[team]
             )
+
+    """Assign Player to Ball"""
+    player_ball_assigner = PlayerBallAssigner()
+    # player_track: {id: player}
+    for frame_num, player_track in enumerate(tracks["players"]):
+        ball_bbox = tracks["ball"][frame_num][1]["bbox"]
+        assigned_player = player_ball_assigner.assign_ball_to_player(
+            player_track, ball_bbox
+        )
+
+        if assigned_player != -1:
+            tracks["players"][frame_num][assigned_player]["has_ball"] = True
 
     """Draw output"""
     # Draw Output Tracks

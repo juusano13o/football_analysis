@@ -166,10 +166,13 @@ class Tracker:
             referee_dict = tracks["referees"][frame_num]
             ball_dict = tracks["ball"][frame_num]
 
-            # draw circle beneath players
+            # draw circle beneath players and triangle above if has_ball
             for track_id, player in player_dict.items():
                 color = player.get("team_color", (0, 0, 255))
                 frame = self.draw_ellipse(frame, player["bbox"], color, track_id)
+
+                if player.get("has_ball", False):
+                    frame = self.draw_triangle(frame, player["bbox"], (0, 0, 255))
 
             # draw circle beneath referee
             for _, referee in referee_dict.items():
