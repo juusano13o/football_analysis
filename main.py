@@ -5,6 +5,7 @@ from player_ball_assigner import PlayerBallAssigner
 from team_assigner import TeamAssigner
 from trackers import Tracker
 from utils import read_video, save_video
+from view_transformer import ViewTransformer
 
 
 def main():
@@ -28,6 +29,10 @@ def main():
     camera_movement_estimator.add_adjust_positions_to_tracks(
         tracks, camera_movement_per_frame
     )
+
+    """View Transformer: convert pixel to meter"""
+    view_transformer = ViewTransformer()
+    view_transformer.add_transformed_position_to_tracks(tracks)
 
     """interpolate ball positions"""
     tracks["ball"] = tracker.interpolate_ball_positions(tracks["ball"])
