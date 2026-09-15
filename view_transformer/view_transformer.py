@@ -4,14 +4,17 @@ import numpy as np
 
 class ViewTransformer:
     def __init__(self):
-        court_width = 68
+        court_width = 40.32
         court_length = 23.32
 
         # trapezoid positions
-        self.pixel_verticies = np.array([])
+        # adjust to suit your specific situation
+        self.pixel_verticies = np.array(
+            [[190, 748], [1036, 239], [1919, 330], [1420, 934]]
+        )
 
         # real rectangle position
-        self.target_verticies = np.appray(
+        self.target_verticies = np.array(
             [
                 [0, court_width],
                 [0, 0],
